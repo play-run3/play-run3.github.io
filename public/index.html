@@ -1,396 +1,93 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>URL Signal — Bulk Status &amp; Redirect Checker</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>URL Signal — HTTP Status & Redirect Checker</title>
+<meta name="description" content="Bulk HTTP status, redirect and technical URL checker for SEO audits.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  :root{
-    --ink:#0B111C;
-    --panel:#131A28;
-    --panel-2:#0F1521;
-    --hairline:#242D40;
-    --text:#E7ECF5;
-    --muted:#8B96AC;
-    --green:#3DDC84;
-    --amber:#F5A623;
-    --red:#FF5C5C;
-    --gray:#5A6478;
-    --blue:#5B8CFF;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--ink);
-    color:var(--text);
-    font-family:'Space Grotesk',system-ui,sans-serif;
-    min-height:100vh;
-  }
-  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px;}
+:root{--bg:#f7f8fa;--card:#fff;--line:#e3e7ed;--text:#172033;--muted:#697586;--blue:#2563eb;--green:#16834b;--amber:#a96500;--red:#c73535;--shadow:0 1px 2px #1018280a,0 8px 30px #10182808;--input:#fff;--thead:#f8fafc;--hover:#fbfcfe;--detail:#fafbfc;--code:#f2f4f7}
+:root[data-theme="dark"]{--bg:#0b0f14;--card:#11161d;--line:#252d38;--text:#e7edf5;--muted:#8d99aa;--blue:#5b8cff;--green:#35c27b;--amber:#f0ad4e;--red:#ff6b6b;--shadow:0 1px 2px #0008,0 12px 35px #0005;--input:#0d1218;--thead:#151b23;--hover:#151b23;--detail:#0f141b;--code:#1a212b}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--text);transition:background .2s,color .2s;font-family:Inter,Arial,sans-serif}
+.top{height:64px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center}.wrap{max-width:1240px;margin:auto;padding:0 22px}.nav{display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px}.mark{width:30px;height:30px;border-radius:7px;background:#111827;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}.brand b{font-size:16px}.brand span{font-size:11px;color:var(--muted);margin-left:3px}.nav small{color:var(--muted)}.dot{display:inline-block;width:7px;height:7px;background:#16a34a;border-radius:50%;margin-right:5px}
+main{padding:42px 0 70px}.hero{text-align:center;max-width:800px;margin:0 auto 26px}.eyebrow{display:inline-block;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.hero h1{font-size:35px;line-height:1.15;letter-spacing:-.045em;margin:14px 0 9px}.hero p{color:var(--muted);font-size:14px;line-height:1.65;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}.input{padding:19px}.label{font-size:12px;font-weight:700;margin-bottom:9px}
+textarea{width:100%;height:190px;resize:vertical;border:1px solid #d5dbe4;border-radius:8px;padding:13px 14px;font:12px/1.65 "JetBrains Mono",monospace;color:var(--text);outline:0}textarea:focus,input:focus,select:focus{border-color:#8ab4f8;box-shadow:0 0 0 3px #2563eb12;outline:0}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:11px}.file,.btn{border:1px solid #d5dbe4;background:#fff;border-radius:7px;padding:8px 11px;font-size:11.5px;font-weight:600;color:var(--text);cursor:pointer}.file:hover,.btn:hover{background:var(--hover)}.count{font:10.5px "JetBrains Mono",monospace;color:var(--muted);margin-left:auto}input[type=file]{display:none}
+.controls{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}label.small{display:block;font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}select,.search{width:100%;height:37px;border:1px solid #d5dbe4;border-radius:7px;background:#fff;padding:0 9px;color:var(--text);font-size:11.5px}
+.primary{width:100%;height:40px;border:0;border-radius:7px;background:var(--blue);color:#fff;font-size:12.5px;font-weight:700;margin-top:15px}.primary:hover{background:#1d4ed8}.primary:disabled{opacity:.55}
+.progress{display:none;margin:15px 0}.ph{display:flex;justify-content:space-between;color:var(--muted);font-size:10.5px;margin-bottom:5px}.track{height:5px;background:#e9edf3;border-radius:9px;overflow:hidden}.bar{height:100%;width:0;background:var(--blue);transition:.2s}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:18px 0 13px}.stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px}.stathead{font-size:9.5px;color:var(--muted);font-weight:700}.num{font:600 21px "JetBrains Mono",monospace;margin-top:6px}
+.results{overflow:hidden}.toolbar{padding:12px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}.title{font-size:12px;font-weight:700;margin-right:auto}.search{width:230px}.filter{width:145px}.toolbar .btn{height:34px;padding:0 11px}
+.table{overflow:auto;max-height:650px}table{width:100%;min-width:980px;border-collapse:collapse}th{position:sticky;top:0;background:var(--thead);border-bottom:1px solid var(--line);padding:10px 11px;text-align:left;color:#667085;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase}td{border-bottom:1px solid #eef1f5;padding:10px 11px;font-size:11px;vertical-align:top}tr:hover td{background:var(--hover)}.url{max-width:370px;word-break:break-all;font:10.5px "JetBrains Mono",monospace}.final{max-width:340px;word-break:break-all;color:var(--muted);font:10px "JetBrains Mono",monospace}
+.badge{display:inline-flex;min-width:41px;justify-content:center;padding:4px 7px;border-radius:5px;font:600 10px "JetBrains Mono",monospace}.s2{background:#ecfdf3;color:var(--green)}.s3{background:#fff7e6;color:var(--amber)}.s4,.s5{background:#fff1f1;color:var(--red)}.err{background:var(--code);color:#8d99aa}
+.expand{width:25px;height:25px;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--blue);font-weight:700}.details td{background:var(--detail);padding:0}.detail{display:grid;grid-template-columns:1.3fr .7fr;gap:12px;padding:14px 45px}.box{border:1px solid var(--line);border-radius:7px;background:var(--card);padding:10px}.box h4{font-size:9.5px;color:var(--muted);text-transform:uppercase;margin:0 0 7px}.chain{font:10px/1.7 "JetBrains Mono",monospace;word-break:break-all}.chain div{padding:5px 0;border-bottom:1px solid #f0f2f5}.kv{display:grid;grid-template-columns:105px 1fr;gap:6px;font-size:10px}.kv b{color:var(--muted)}
+.empty{text-align:center;padding:60px;color:var(--muted);font-size:11.5px}.footer{text-align:center;color:#98a2b3;font-size:10px;margin-top:32px}.toast{display:none;position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:10px 13px;border-radius:7px;font-size:11px;z-index:20}
+@media(max-width:850px){.controls{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(3,1fr)}.hero h1{font-size:30px}}
+@media(max-width:600px){.wrap{padding:0 13px}main{padding-top:28px}.hero h1{font-size:26px}.controls{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.search{width:100%}.detail{grid-template-columns:1fr;padding:12px}}
 
-  /* Header */
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
-  .brand{display:flex;align-items:center;gap:10px;}
-  .brand-mark{width:14px;height:14px;border-radius:3px;background:var(--green);box-shadow:0 0 12px var(--green);}
-  .brand-name{font-weight:700;font-size:18px;letter-spacing:-0.01em;}
-  .brand-sub{color:var(--muted);font-size:12.5px;font-family:'JetBrains Mono',monospace;margin-left:4px;}
-  .stat-pill{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);border:1px solid var(--hairline);padding:5px 10px;border-radius:20px;}
-
-  h1{font-size:15px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:600;margin:0 0 6px;}
-
-  /* Panels */
-  .panel{background:var(--panel);border:1px solid var(--hairline);border-radius:10px;padding:20px;}
-  .grid{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:20px;}
-  @media(min-width:860px){.grid{grid-template-columns:1.1fr 0.9fr;}}
-
-  textarea{
-    width:100%;min-height:220px;resize:vertical;
-    background:var(--panel-2);border:1px solid var(--hairline);border-radius:8px;
-    color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;
-    padding:14px;outline:none;
-  }
-  textarea:focus{border-color:var(--blue);}
-  textarea::placeholder{color:var(--gray);}
-
-  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;}
-  .field{display:flex;flex-direction:column;gap:4px;}
-  .field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
-  select,input[type=number]{
-    background:var(--panel-2);border:1px solid var(--hairline);color:var(--text);
-    border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:13px;
-  }
-  .filebtn{
-    border:1px dashed var(--hairline);color:var(--muted);font-size:12.5px;
-    padding:7px 12px;border-radius:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;
-  }
-  .filebtn:hover{border-color:var(--blue);color:var(--text);}
-  input[type=file]{display:none;}
-
-  button.primary{
-    background:var(--green);color:#08130D;border:none;border-radius:7px;
-    padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Space Grotesk',sans-serif;
-    transition:transform .1s ease, opacity .15s ease;
-  }
-  button.primary:hover{opacity:0.9;}
-  button.primary:active{transform:scale(0.98);}
-  button.primary:disabled{background:var(--gray);color:#0B111C;cursor:not-allowed;}
-
-  button.secondary{
-    background:transparent;color:var(--text);border:1px solid var(--hairline);border-radius:7px;
-    padding:10px 18px;font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Space Grotesk',sans-serif;
-  }
-  button.secondary:hover{border-color:var(--blue);}
-  button.secondary:disabled{opacity:0.4;cursor:not-allowed;}
-
-  /* Signal strip — signature element */
-  .signal-strip{
-    display:flex;flex-wrap:wrap;gap:2px;min-height:34px;align-content:flex-start;
-    background:var(--panel-2);border:1px solid var(--hairline);border-radius:8px;padding:8px;
-  }
-  .signal-strip .tick{width:6px;height:18px;border-radius:1px;background:var(--hairline);}
-  .tick.s2{background:var(--green);}
-  .tick.s3{background:var(--amber);}
-  .tick.s4, .tick.s5{background:var(--red);}
-  .tick.err{background:var(--gray);}
-
-  .summary{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;}
-  .chip{
-    font-family:'JetBrains Mono',monospace;font-size:12.5px;padding:8px 14px;border-radius:8px;
-    border:1px solid var(--hairline);background:var(--panel-2);display:flex;gap:8px;align-items:center;
-  }
-  .chip .dot{width:8px;height:8px;border-radius:50%;}
-  .dot.total{background:var(--blue);}
-  .dot.ok{background:var(--green);}
-  .dot.redir{background:var(--amber);}
-  .dot.err{background:var(--red);}
-
-  .progress-outer{height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden;border:1px solid var(--hairline);margin:4px 0 16px;}
-  .progress-inner{height:100%;background:var(--green);width:0%;transition:width .2s ease;}
-
-  table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:12.5px;}
-  thead th{
-    text-align:left;color:var(--muted);font-weight:600;text-transform:uppercase;font-size:10.5px;
-    letter-spacing:0.05em;padding:10px 12px;border-bottom:1px solid var(--hairline);position:sticky;top:0;background:var(--panel);
-  }
-  tbody td{padding:9px 12px;border-bottom:1px solid var(--panel-2);vertical-align:top;word-break:break-all;}
-  tbody tr:hover{background:var(--panel-2);}
-  .status-badge{padding:2px 8px;border-radius:4px;font-weight:600;display:inline-block;min-width:38px;text-align:center;}
-  .status-badge.s2{background:rgba(61,220,132,0.15);color:var(--green);}
-  .status-badge.s3{background:rgba(245,166,35,0.15);color:var(--amber);}
-  .status-badge.s4, .status-badge.s5{background:rgba(255,92,92,0.15);color:var(--red);}
-  .status-badge.err{background:rgba(90,100,120,0.2);color:var(--muted);}
-  .table-wrap{max-height:520px;overflow:auto;border:1px solid var(--hairline);border-radius:8px;margin-top:8px;}
-  .muted{color:var(--muted);}
-  .empty-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:13px;}
-  .footer-note{color:var(--gray);font-size:11.5px;text-align:center;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+.theme-toggle{height:34px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:7px;padding:0 10px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.theme-toggle:hover{background:var(--hover)}
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <header>
-    <div class="brand">
-      <div class="brand-mark" id="pulseMark"></div>
-      <div class="brand-name">URL Signal</div>
-      <div class="brand-sub">/ bulk status &amp; redirect checker</div>
-    </div>
-    <div class="stat-pill" id="capacityPill">up to 2,000 URLs per run</div>
-  </header>
-
-  <div class="grid">
-    <div class="panel">
-      <h1>Input</h1>
-      <textarea id="urlInput" placeholder="Ek line mein ek URL likhein, jaise:&#10;https://example.com&#10;https://google.com&#10;www.wikipedia.org"></textarea>
-      <div class="row">
-        <label class="filebtn">
-          Upload .txt / .csv
-          <input type="file" id="fileInput" accept=".txt,.csv">
-        </label>
-        <span class="muted" id="urlCountLabel" style="font-family:'JetBrains Mono',monospace;font-size:12px;">0 URLs ready</span>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label>Concurrency</label>
-          <select id="concurrency">
-            <option value="20">20 — gentle</option>
-            <option value="50" selected>50 — balanced</option>
-            <option value="100">100 — fast</option>
-            <option value="200">200 — aggressive</option>
-          </select>
-        </div>
-        <div style="flex:1"></div>
-        <button class="primary" id="checkBtn">Check URLs</button>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h1>Live signal</h1>
-      <p class="muted" style="font-size:12.5px;margin-top:0;">Har URL check hote hi ek tick yahan roshan hota hai — green (2xx), amber (redirect), red (error).</p>
-      <div class="signal-strip" id="signalStrip"></div>
-      <div class="progress-outer" style="margin-top:14px;"><div class="progress-inner" id="progressBar"></div></div>
-      <div class="muted" id="progressLabel" style="font-family:'JetBrains Mono',monospace;font-size:12px;">Ready.</div>
-    </div>
-  </div>
-
-  <div class="summary" id="summaryChips" style="display:none;">
-    <div class="chip"><span class="dot total"></span><span id="chipTotal">0</span>&nbsp;total</div>
-    <div class="chip"><span class="dot ok"></span><span id="chipOk">0</span>&nbsp;success (2xx)</div>
-    <div class="chip"><span class="dot redir"></span><span id="chipRedir">0</span>&nbsp;redirects (3xx)</div>
-    <div class="chip"><span class="dot err"></span><span id="chipErr">0</span>&nbsp;errors (4xx/5xx/failed)</div>
-    <div style="flex:1"></div>
-    <button class="secondary" id="downloadBtn" disabled>Download Excel (.xlsx)</button>
-  </div>
-
-  <div class="panel" style="padding:0;overflow:hidden;">
-    <div class="table-wrap" id="tableWrap">
-      <div class="empty-state" id="emptyState">Abhi tak koi result nahi. URLs paste karein aur "Check URLs" dabayein.</div>
-    </div>
-  </div>
-
-  <div class="footer-note">URL Signal — server-side checks, no browser CORS limits. Runs entirely on your own deployment.</div>
+<header class="top"><div class="wrap nav"><div class="brand"><div class="mark">US</div><div><b>URL Signal</b><span>HTTP status & redirect checker</span></div></div><div style="display:flex;align-items:center;gap:12px"><button class="theme-toggle" id="themeToggle" type="button">☾ Dark mode</button><small><i class="dot"></i>Service ready</small></div></div></header>
+<main><div class="wrap">
+<section class="hero"><div class="eyebrow">SEO & technical auditing</div><h1>Check HTTP status codes and redirect chains</h1><p>Bulk-check URLs, inspect redirects, filter technical issues and export your results for SEO audits and migrations.</p></section>
+<section class="card input">
+<div class="label">Request URLs</div>
+<textarea id="urls" placeholder="https://example.com&#10;http://example.com&#10;https://google.com"></textarea>
+<div class="row"><label class="file">Upload TXT / CSV <input id="file" type="file" accept=".txt,.csv"></label><button class="btn" id="examples">Use examples</button><button class="btn" id="clear">Clear</button><span class="count" id="count">0 URLs</span></div>
+<div class="controls">
+<div><label class="small">User-Agent</label><select id="ua"><option value="">Default Chrome</option><option value="Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)">Googlebot</option><option value="Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)">Bingbot</option><option value="facebookexternalhit/1.1">Facebook crawler</option><option value="Twitterbot/1.0">Twitterbot</option></select></div>
+<div><label class="small">Concurrency</label><select id="con"><option>20</option><option selected>50</option><option>100</option><option>200</option></select></div>
+<div><label class="small">Bare URL scheme</label><select id="scheme"><option selected>HTTPS</option><option>HTTP</option></select></div>
+<div><label class="small">Sort results</label><select id="sort"><option value="input" selected>Input order</option><option value="status">Status</option><option value="redirects">Redirects</option><option value="time">Response time</option></select></div>
 </div>
-
+<button class="primary" id="check">Check status</button>
+</section>
+<div class="progress" id="progress"><div class="ph"><span id="plabel">Checking…</span><span id="pct">0%</span></div><div class="track"><div class="bar" id="bar"></div></div></div>
+<section class="stats"><div class="stat"><div class="stathead">TOTAL</div><div class="num" id="stTotal">0</div></div><div class="stat"><div class="stathead">2XX SUCCESS</div><div class="num" id="st2">0</div></div><div class="stat"><div class="stathead">3XX REDIRECT</div><div class="num" id="st3">0</div></div><div class="stat"><div class="stathead">4XX / 5XX</div><div class="num" id="st45">0</div></div><div class="stat"><div class="stathead">ERRORS</div><div class="num" id="stErr">0</div></div></section>
+<section class="card results"><div class="toolbar"><div class="title">Results <span id="visible" style="color:#98a2b3;font-weight:500">(0)</span></div><input class="search" id="search" placeholder="Search URL or final URL…"><select class="filter" id="filter"><option value="all">All statuses</option><option value="2xx">2xx success</option><option value="3xx">3xx redirects</option><option value="4xx">4xx errors</option><option value="5xx">5xx errors</option><option value="error">Request errors</option><option value="redirected">Has redirects</option><option value="none">No redirects</option></select><button class="btn" id="csv" disabled>CSV</button><button class="btn" id="xlsx" disabled>Excel</button></div>
+<div class="table"><table><thead><tr><th></th><th>#</th><th>Request URL</th><th>Status</th><th>Final URL</th><th>Redirects</th><th>Time</th><th>Content-Type</th></tr></thead><tbody id="body"><tr><td colspan="8"><div class="empty">No results yet. Add URLs above and click “Check status”.</div></td></tr></tbody></table></div></section>
+<div class="footer">URL Signal · server-side HTTP checks · built for SEO audits, migrations and redirect validation</div>
+</div></main>
+<div class="toast" id="toast"></div>
 <script>
-const urlInput = document.getElementById('urlInput');
-const fileInput = document.getElementById('fileInput');
-const urlCountLabel = document.getElementById('urlCountLabel');
-const checkBtn = document.getElementById('checkBtn');
-const concurrencySelect = document.getElementById('concurrency');
-const signalStrip = document.getElementById('signalStrip');
-const progressBar = document.getElementById('progressBar');
-const progressLabel = document.getElementById('progressLabel');
-const summaryChips = document.getElementById('summaryChips');
-const chipTotal = document.getElementById('chipTotal');
-const chipOk = document.getElementById('chipOk');
-const chipRedir = document.getElementById('chipRedir');
-const chipErr = document.getElementById('chipErr');
-const downloadBtn = document.getElementById('downloadBtn');
-const tableWrap = document.getElementById('tableWrap');
-const emptyState = document.getElementById('emptyState');
 
-let allResults = [];
-
-function parseUrlsFromText(text) {
-  return text.split('\n').map(l => l.trim()).filter(Boolean);
+const themeToggle=document.getElementById("themeToggle");
+function applyTheme(theme){
+  document.documentElement.dataset.theme=theme;
+  localStorage.setItem("urlSignalTheme",theme);
+  themeToggle.textContent=theme==="dark"?"☀ Light mode":"☾ Dark mode";
 }
+const savedTheme=localStorage.getItem("urlSignalTheme");
+applyTheme(savedTheme || (matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+themeToggle.addEventListener("click",()=>applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark"));
 
-function updateUrlCount() {
-  const count = parseUrlsFromText(urlInput.value).length;
-  urlCountLabel.textContent = `${count} URL${count === 1 ? '' : 's'} ready`;
-}
-urlInput.addEventListener('input', updateUrlCount);
-
-fileInput.addEventListener('change', () => {
-  const file = fileInput.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    let text = e.target.result;
-    if (file.name.toLowerCase().endsWith('.csv')) {
-      // Naive CSV handling: take first column, skip an obvious header row
-      text = text.split('\n').map(line => line.split(',')[0].trim()).join('\n');
-    }
-    urlInput.value = text;
-    updateUrlCount();
-  };
-  reader.readAsText(file);
-});
-
-function statusClass(code) {
-  const s = String(code);
-  if (s.startsWith('2')) return 's2';
-  if (s.startsWith('3')) return 's3';
-  if (s.startsWith('4')) return 's4';
-  if (s.startsWith('5')) return 's5';
-  return 'err';
-}
-
-function addTick(cls) {
-  const tick = document.createElement('div');
-  tick.className = 'tick ' + cls;
-  signalStrip.appendChild(tick);
-}
-
-function ensureTable() {
-  if (emptyState.parentNode) emptyState.remove();
-  if (!document.getElementById('resultsTable')) {
-    const table = document.createElement('table');
-    table.id = 'resultsTable';
-    table.innerHTML = `<thead><tr>
-      <th>#</th><th>URL</th><th>Status</th><th>Final URL</th>
-      <th>Redirects</th><th>Time (ms)</th><th>Content-Type</th><th>Error</th>
-    </tr></thead><tbody id="resultsBody"></tbody>`;
-    tableWrap.appendChild(table);
-  }
-}
-
-function addRow(r) {
-  ensureTable();
-  const tbody = document.getElementById('resultsBody');
-  const tr = document.createElement('tr');
-  const cls = r.error ? 'err' : statusClass(r.statusCode);
-  const badge = r.error
-    ? `<span class="status-badge err">ERR</span>`
-    : `<span class="status-badge ${cls}">${r.statusCode}</span>`;
-  tr.innerHTML = `
-    <td class="muted">${r.index + 1}</td>
-    <td>${r.originalUrl}</td>
-    <td>${badge}</td>
-    <td class="muted">${r.finalUrl || '—'}</td>
-    <td class="muted">${r.redirectCount || 0}</td>
-    <td class="muted">${r.responseTimeMs || '—'}</td>
-    <td class="muted">${(r.contentType || '').split(';')[0] || '—'}</td>
-    <td style="color:var(--red)">${r.error || ''}</td>
-  `;
-  tbody.appendChild(tr);
-}
-
-function resetUI() {
-  allResults = [];
-  signalStrip.innerHTML = '';
-  progressBar.style.width = '0%';
-  progressLabel.textContent = 'Starting...';
-  summaryChips.style.display = 'none';
-  downloadBtn.disabled = true;
-  tableWrap.innerHTML = '';
-  emptyState.textContent = 'Checking in progress...';
-  tableWrap.appendChild(emptyState);
-}
-
-function updateSummary() {
-  const total = allResults.length;
-  const ok = allResults.filter(r => String(r.statusCode).startsWith('2')).length;
-  const redir = allResults.filter(r => String(r.statusCode).startsWith('3')).length;
-  const err = total - ok - redir;
-  chipTotal.textContent = total;
-  chipOk.textContent = ok;
-  chipRedir.textContent = redir;
-  chipErr.textContent = err;
-  summaryChips.style.display = 'flex';
-}
-
-checkBtn.addEventListener('click', async () => {
-  const urls = parseUrlsFromText(urlInput.value);
-  if (urls.length === 0) {
-    alert('Pehle kuch URLs daalein.');
-    return;
-  }
-
-  resetUI();
-  checkBtn.disabled = true;
-  checkBtn.textContent = 'Checking...';
-
-  try {
-    const response = await fetch('/api/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        urls,
-        concurrency: parseInt(concurrencySelect.value, 10),
-      }),
-    });
-
-    if (!response.ok || !response.body) {
-      throw new Error('Server error: ' + response.status);
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop();
-
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        const r = JSON.parse(line);
-        allResults.push(r);
-        addRow(r);
-        addTick(r.error ? 'err' : statusClass(r.statusCode));
-
-        const pct = Math.round((allResults.length / r.total) * 100);
-        progressBar.style.width = pct + '%';
-        progressLabel.textContent = `${allResults.length} / ${r.total} checked (${pct}%)`;
-        updateSummary();
-      }
-    }
-
-    progressLabel.textContent = `Done. ${allResults.length} URLs checked.`;
-    downloadBtn.disabled = allResults.length === 0;
-  } catch (err) {
-    progressLabel.textContent = 'Error: ' + err.message;
-  } finally {
-    checkBtn.disabled = false;
-    checkBtn.textContent = 'Check URLs';
-  }
-});
-
-downloadBtn.addEventListener('click', () => {
-  const sorted = [...allResults].sort((a, b) => a.index - b.index);
-  const rows = sorted.map(r => ({
-    'Original URL': r.originalUrl,
-    'Final URL': r.finalUrl,
-    'Status Code': r.statusCode,
-    'Redirect Count': r.redirectCount,
-    'Redirect Chain': r.redirectChain,
-    'Response Time (ms)': r.responseTimeMs,
-    'Content-Type': r.contentType,
-    'Server': r.server,
-    'Content Length (bytes)': r.contentLength,
-    'Error': r.error,
-  }));
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Results');
-  XLSX.writeFile(wb, 'url-check-results.xlsx');
-});
+const API_BASE=location.hostname.includes("onrender.com")?"":"https://play-run3-github-io.onrender.com", $=id=>document.getElementById(id);
+const urls=$("urls"),file=$("file"),count=$("count"),body=$("body"),check=$("check");let results=[],open=new Set();
+const list=()=>urls.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),updateCount=()=>count.textContent=list().length.toLocaleString()+" URLs";urls.addEventListener("input",updateCount);
+$("clear").onclick=()=>{urls.value="";updateCount();urls.focus()};$("examples").onclick=()=>{urls.value="https://example.com\nhttp://example.com\nhttps://google.com";updateCount()};
+file.onchange=()=>{let f=file.files[0];if(!f)return;let r=new FileReader();r.onload=e=>{let t=e.target.result;if(f.name.toLowerCase().endsWith(".csv"))t=t.split(/\r?\n/).map(x=>x.split(",")[0].trim()).filter(Boolean).join("\n");urls.value=t;updateCount()};r.readAsText(f)};
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function cls(c){c=String(c||"");return c.startsWith("2")?"s2":c.startsWith("3")?"s3":c.startsWith("4")?"s4":c.startsWith("5")?"s5":"err"}
+function toast(t){let x=$("toast");x.textContent=t;x.style.display="block";clearTimeout(x.t);x.t=setTimeout(()=>x.style.display="none",2400)}
+function summary(){let a=results.length,b=results.filter(x=>String(x.statusCode).startsWith("2")).length,c=results.filter(x=>String(x.statusCode).startsWith("3")).length,d=results.filter(x=>/^[45]/.test(String(x.statusCode||""))).length,e=results.filter(x=>x.error).length;$("stTotal").textContent=a.toLocaleString();$("st2").textContent=b.toLocaleString();$("st3").textContent=c.toLocaleString();$("st45").textContent=d.toLocaleString();$("stErr").textContent=e.toLocaleString()}
+function filtered(){let q=$("search").value.toLowerCase().trim(),f=$("filter").value,s=$("sort").value,a=results.filter(r=>{let c=String(r.statusCode||""),red=Number(r.redirectCount||0)>0;if(q&&!(`${r.originalUrl} ${r.finalUrl||""}`).toLowerCase().includes(q))return false;if(f==="2xx")return c.startsWith("2");if(f==="3xx")return c.startsWith("3");if(f==="4xx")return c.startsWith("4");if(f==="5xx")return c.startsWith("5");if(f==="error")return!!r.error;if(f==="redirected")return red;if(f==="none")return!red;return true});if(s==="status")a.sort((x,y)=>Number(x.statusCode||0)-Number(y.statusCode||0));if(s==="redirects")a.sort((x,y)=>Number(y.redirectCount||0)-Number(x.redirectCount||0));if(s==="time")a.sort((x,y)=>Number(y.responseTimeMs||0)-Number(x.responseTimeMs||0));if(s==="input")a.sort((x,y)=>x.index-y.index);return a}
+function render(){let a=filtered();$("visible").textContent="("+a.length.toLocaleString()+")";if(!a.length){body.innerHTML=`<tr><td colspan="8"><div class="empty">${results.length?"No results match the filters.":"No results yet. Add URLs above and click “Check status”."}</div></td></tr>`;return}body.innerHTML=a.map(r=>{let k=String(r.index),is=open.has(k),ch=String(r.redirectChain||"").split(" | ").filter(Boolean);return `<tr><td><button class="expand" data-open="${k}">${is?"−":"+"}</button></td><td style="color:#98a2b3">${r.index+1}</td><td class="url">${esc(r.originalUrl)}</td><td><span class="badge ${r.error?"err":cls(r.statusCode)}">${r.error?"ERR":esc(r.statusCode)}</span></td><td class="final">${esc(r.finalUrl||"—")}</td><td>${r.redirectCount||0}</td><td>${r.responseTimeMs?Number(r.responseTimeMs).toLocaleString()+" ms":"—"}</td><td>${esc((r.contentType||"").split(";")[0]||"—")}</td></tr>${is?`<tr class="details"><td colspan="8"><div class="detail"><div class="box"><h4>Redirect chain</h4><div class="chain">${ch.length?ch.map((x,i)=>`<div>${i+1}. ${esc(x)}</div>`).join(""):"No redirects detected."}</div></div><div class="box"><h4>Response details</h4><div class="kv"><b>Original</b><span>${esc(r.originalUrl)}</span><b>Final</b><span>${esc(r.finalUrl||"—")}</span><b>Server</b><span>${esc(r.server||"—")}</span><b>Content length</b><span>${esc(r.contentLength||"—")}</span><b>Error</b><span>${esc(r.error||"—")}</span></div></div></div></td></tr>`:""}`}).join("")}
+body.onclick=e=>{let b=e.target.closest("[data-open]");if(!b)return;let k=b.dataset.open;open.has(k)?open.delete(k):open.add(k);render()};["search","filter","sort"].forEach(id=>$(id).addEventListener("input",render));["filter","sort"].forEach(id=>$(id).addEventListener("change",render));
+function progress(done,total){let p=total?Math.round(done/total*100):0;$("bar").style.width=p+"%";$("pct").textContent=p+"%";$("plabel").textContent=done.toLocaleString()+" / "+total.toLocaleString()+" checked"}
+check.onclick=async()=>{let raw=list(),sc=$("scheme").value.toLowerCase();if(!raw.length){toast("Add at least one URL first.");return}if(raw.length>2000){toast("Maximum 2,000 URLs per run.");return}raw=raw.map(u=>/^https?:\/\//i.test(u)?u:sc+"://"+u);results=[];open.clear();render();summary();$("progress").style.display="block";progress(0,raw.length);check.disabled=true;check.textContent="Checking…";try{let res=await fetch(API_BASE+"/api/check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({urls:raw,concurrency:Number($("con").value),userAgent:$("ua").value})});if(!res.ok||!res.body)throw Error("Server error: "+res.status);let rd=res.body.getReader(),de=new TextDecoder(),buf="";while(true){let {done,value}=await rd.read();if(done)break;buf+=de.decode(value,{stream:true});let lines=buf.split("\n");buf=lines.pop();for(let line of lines){if(!line.trim())continue;results.push(JSON.parse(line));summary();progress(results.length,Number(results.at(-1).total||raw.length));render()}}if(buf.trim()){results.push(JSON.parse(buf));summary();render()}progress(results.length,raw.length);$("plabel").textContent="Done — "+results.length.toLocaleString()+" URLs checked";$("csv").disabled=$("xlsx").disabled=!results.length;toast("Check completed.")}catch(e){$("plabel").textContent="Error: "+e.message;toast(e.message)}finally{check.disabled=false;check.textContent="Check status"}};
+function exportRows(){return filtered().map(r=>({"Original URL":r.originalUrl,"Final URL":r.finalUrl,"Status Code":r.statusCode,"Redirect Count":r.redirectCount,"Redirect Chain":r.redirectChain,"Response Time (ms)":r.responseTimeMs,"Content-Type":r.contentType,"Server":r.server,"Content Length (bytes)":r.contentLength,"Error":r.error}))}
+function save(blob,name){let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+$("csv").onclick=()=>{let a=exportRows();if(!a.length)return;let h=Object.keys(a[0]),csv=[h,...a.map(r=>h.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`))].map(x=>x.join(",")).join("\r\n");save(new Blob([csv],{type:"text/csv"}),"url-signal-results.csv")};
+$("xlsx").onclick=()=>{let a=exportRows();if(!a.length)return;let ws=XLSX.utils.json_to_sheet(a),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Results");XLSX.writeFile(wb,"url-signal-results.xlsx")};
+updateCount();
 </script>
 </body>
 </html>
