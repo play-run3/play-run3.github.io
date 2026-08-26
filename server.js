@@ -1,7 +1,3 @@
-// Bulk URL Checker — Backend Server
-// Node.js 18+ ka built-in fetch use karta hai, isliye koi extra HTTP library
-// (jaise axios) ki zaroorat nahi.
-
 const express = require("express");
 const path = require("path");
 
@@ -17,24 +13,33 @@ const DEFAULT_USER_AGENT =
 
 const TIMEOUT_MS = 15000;
 const MAX_REDIRECTS = 10;
-const MAX_URLS_PER_REQUEST = 2000; // safety cap so the server isn't abused
+const MAX_URLS_PER_REQUEST = 2000;
 
 function normalizeUrl(raw) {
   const url = (raw || "").trim();
+
   if (!url) return "";
+
   if (!/^https?:\/\//i.test(url)) {
     return "https://" + url;
   }
+
   return url;
 }
 
-// Follows redirects manually so we can build the full redirect chain,
-// which the standard fetch() redirect:'follow' mode does not expose.
 async function checkUrl(rawUrl, userAgent) {
   const result = {
     originalUrl: rawUrl,
-    finalUrl: "",
+
+    // ORIGINAL URL STATUS
     statusCode: "",
+
+    // FINAL URL AFTER REDIRECTS
+    finalUrl: "",
+
+    // FINAL RESPONSE STATUS
+    finalStatusCode: "",
+
     redirectCount: 0,
     redirectChain: "",
     responseTimeMs: "",
@@ -45,6 +50,7 @@ async function checkUrl(rawUrl, userAgent) {
   };
 
   const url = normalizeUrl(rawUrl);
+
   if (!url) {
     result.error = "Empty URL";
     return result;
@@ -52,88 +58,192 @@ async function checkUrl(rawUrl, userAgent) {
 
   const chain = [];
   let currentUrl = url;
+  let response;
+
   const start = Date.now();
 
   try {
-    let response;
     for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-      response = await fetch(currentUrl, {
-        method: "GET",
-        redirect: "manual",
-        headers: { "User-Agent": userAgent || DEFAULT_USER_AGENT },
-        signal: controller.signal,
-      });
-      clearTimeout(timer);
+      const timer = setTimeout(() => {
+        controller.abort();
+      }, TIMEOUT_MS);
 
-      const isRedirect = [301, 302, 303, 307, 308].includes(response.status);
-      const location = response.headers.get("location");
+      try {
+        response = await fetch(currentUrl, {
+          method: "GET",
+
+          // VERY IMPORTANT
+          // Redirects manually follow honge taake original status
+          // aur final status dono mil saken.
+          redirect: "manual",
+
+          headers: {
+            "User-Agent":
+              userAgent || DEFAULT_USER_AGENT,
+            Accept: "*/*",
+          },
+
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timer);
+      }
+
+      // FIRST RESPONSE = ORIGINAL URL STATUS
+      if (hop === 0) {
+        result.statusCode = response.status;
+      }
+
+      const isRedirect = [
+        301,
+        302,
+        303,
+        307,
+        308,
+      ].includes(response.status);
+
+      const location =
+        response.headers.get("location");
 
       if (isRedirect && location) {
-        chain.push(`${response.status} -> ${currentUrl}`);
-        // Drain the body so the connection can be reused/closed cleanly
-        if (response.body) response.body.cancel().catch(() => {});
-        currentUrl = new URL(location, currentUrl).toString();
+        chain.push(
+          `${response.status} -> ${currentUrl}`
+        );
+
+        if (response.body) {
+          response.body.cancel().catch(() => {});
+        }
+
+        currentUrl = new URL(
+          location,
+          currentUrl
+        ).toString();
+
         continue;
       }
+
       break;
     }
 
     const elapsed = Date.now() - start;
 
+    // FINAL URL
     result.finalUrl = currentUrl;
-    result.statusCode = response.status;
-    result.redirectCount = chain.length;
-    result.redirectChain = chain.join(" | ");
-    result.responseTimeMs = elapsed;
-    result.contentType = response.headers.get("content-type") || "";
-    result.server = response.headers.get("server") || "";
-    result.contentLength = response.headers.get("content-length") || "";
 
-    if (response.body) response.body.cancel().catch(() => {});
+    // FINAL STATUS
+    result.finalStatusCode =
+      response ? response.status : "";
+
+    result.redirectCount = chain.length;
+
+    result.redirectChain =
+      chain.join(" | ");
+
+    result.responseTimeMs = elapsed;
+
+    result.contentType =
+      response?.headers.get("content-type") || "";
+
+    result.server =
+      response?.headers.get("server") || "";
+
+    result.contentLength =
+      response?.headers.get("content-length") || "";
+
+    if (response?.body) {
+      response.body.cancel().catch(() => {});
+    }
   } catch (err) {
     if (err.name === "AbortError") {
-      result.error = `Timeout after ${TIMEOUT_MS / 1000}s`;
+      result.error =
+        `Timeout after ${TIMEOUT_MS / 1000}s`;
     } else {
-      result.error = err.message || String(err);
+      result.error =
+        err.message || String(err);
     }
   }
 
   return result;
 }
 
-// Streams results back as newline-delimited JSON (NDJSON) so the browser
-// can show live progress instead of waiting for all 1000+ URLs to finish.
+
+// ================================
+// BULK CHECK API
+// ================================
+
 app.post("/api/check", async (req, res) => {
-  const { urls, concurrency, userAgent } = req.body || {};
+  const {
+    urls,
+    concurrency,
+    userAgent,
+  } = req.body || {};
 
   if (!Array.isArray(urls) || urls.length === 0) {
-    return res.status(400).json({ error: "No URLs provided" });
+    return res.status(400).json({
+      error: "No URLs provided",
+    });
   }
 
-  const limited = urls.slice(0, MAX_URLS_PER_REQUEST);
-  const poolSize = Math.min(Math.max(parseInt(concurrency) || 50, 1), 200);
+  const limited =
+    urls.slice(0, MAX_URLS_PER_REQUEST);
+
+  const poolSize = Math.min(
+    Math.max(
+      parseInt(concurrency) || 50,
+      1
+    ),
+    200
+  );
 
   res.writeHead(200, {
-    "Content-Type": "application/x-ndjson; charset=utf-8",
+    "Content-Type":
+      "application/x-ndjson; charset=utf-8",
+
     "Cache-Control": "no-cache",
+
     "X-Accel-Buffering": "no",
   });
 
   let index = 0;
 
   async function worker() {
-    while (index < limited.length) {
+    while (true) {
       const i = index++;
-      const result = await checkUrl(limited[i], userAgent);
-      res.write(JSON.stringify({ ...result, index: i, total: limited.length }) + "\n");
+
+      if (i >= limited.length) {
+        return;
+      }
+
+      const result =
+        await checkUrl(
+          limited[i],
+          userAgent
+        );
+
+      res.write(
+        JSON.stringify({
+          ...result,
+
+          index: i,
+
+          total: limited.length,
+        }) + "\n"
+      );
     }
   }
 
-  const workerCount = Math.min(poolSize, limited.length);
-  const workers = Array.from({ length: workerCount }, () => worker());
+  const workerCount = Math.min(
+    poolSize,
+    limited.length
+  );
+
+  const workers =
+    Array.from(
+      { length: workerCount },
+      () => worker()
+    );
 
   try {
     await Promise.all(workers);
@@ -142,8 +252,30 @@ app.post("/api/check", async (req, res) => {
   }
 });
 
-app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
-app.listen(PORT, () => {
-  console.log(`Bulk URL Checker running on http://localhost:${PORT}`);
-});
+// ================================
+// HEALTH CHECK
+// ================================
+
+app.get(
+  "/api/health",
+  (req, res) => {
+    res.json({
+      status: "ok",
+    });
+  }
+);
+
+
+// ================================
+// START SERVER
+// ================================
+
+app.listen(
+  PORT,
+  () => {
+    console.log(
+      `Bulk URL Checker running on port ${PORT}`
+    );
+  }
+);
