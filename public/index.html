@@ -23,7 +23,7 @@ textarea{width:100%;height:190px;resize:vertical;border:1px solid #d5dbe4;border
 .progress{display:none;margin:15px 0}.ph{display:flex;justify-content:space-between;color:var(--muted);font-size:10.5px;margin-bottom:5px}.track{height:5px;background:#e9edf3;border-radius:9px;overflow:hidden}.bar{height:100%;width:0;background:var(--blue);transition:.2s}
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:18px 0 13px}.stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px}.stathead{font-size:9.5px;color:var(--muted);font-weight:700}.num{font:600 21px "JetBrains Mono",monospace;margin-top:6px}
 .results{overflow:hidden}.toolbar{padding:12px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}.title{font-size:12px;font-weight:700;margin-right:auto}.search{width:230px}.filter{width:145px}.toolbar .btn{height:34px;padding:0 11px}
-.table{overflow:auto;max-height:650px}table{width:100%;min-width:980px;border-collapse:collapse}th{position:sticky;top:0;background:var(--thead);border-bottom:1px solid var(--line);padding:10px 11px;text-align:left;color:#667085;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase}td{border-bottom:1px solid #eef1f5;padding:10px 11px;font-size:11px;vertical-align:top}tr:hover td{background:var(--hover)}.url{max-width:370px;word-break:break-all;font:10.5px "JetBrains Mono",monospace}.final{max-width:340px;word-break:break-all;color:var(--muted);font:10px "JetBrains Mono",monospace}
+.table{overflow:auto;max-height:650px}table{width:100%;min-width:1120px;border-collapse:collapse}th{position:sticky;top:0;background:var(--thead);border-bottom:1px solid var(--line);padding:10px 11px;text-align:left;color:#667085;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase}td{border-bottom:1px solid #eef1f5;padding:10px 11px;font-size:11px;vertical-align:top}tr:hover td{background:var(--hover)}.url{max-width:370px;word-break:break-all;font:10.5px "JetBrains Mono",monospace}.final{max-width:340px;word-break:break-all;color:var(--muted);font:10px "JetBrains Mono",monospace}
 .badge{display:inline-flex;min-width:41px;justify-content:center;padding:4px 7px;border-radius:5px;font:600 10px "JetBrains Mono",monospace}.s2{background:#ecfdf3;color:var(--green)}.s3{background:#fff7e6;color:var(--amber)}.s4,.s5{background:#fff1f1;color:var(--red)}.err{background:var(--code);color:#8d99aa}
 .expand{width:25px;height:25px;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--blue);font-weight:700}.details td{background:var(--detail);padding:0}.detail{display:grid;grid-template-columns:1.3fr .7fr;gap:12px;padding:14px 45px}.box{border:1px solid var(--line);border-radius:7px;background:var(--card);padding:10px}.box h4{font-size:9.5px;color:var(--muted);text-transform:uppercase;margin:0 0 7px}.chain{font:10px/1.7 "JetBrains Mono",monospace;word-break:break-all}.chain div{padding:5px 0;border-bottom:1px solid #f0f2f5}.kv{display:grid;grid-template-columns:105px 1fr;gap:6px;font-size:10px}.kv b{color:var(--muted)}
 .empty{text-align:center;padding:60px;color:var(--muted);font-size:11.5px}.footer{text-align:center;color:#98a2b3;font-size:10px;margin-top:32px}.toast{display:none;position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:10px 13px;border-radius:7px;font-size:11px;z-index:20}
@@ -52,9 +52,9 @@ textarea{width:100%;height:190px;resize:vertical;border:1px solid #d5dbe4;border
 <button class="primary" id="check">Check status</button>
 </section>
 <div class="progress" id="progress"><div class="ph"><span id="plabel">Checking…</span><span id="pct">0%</span></div><div class="track"><div class="bar" id="bar"></div></div></div>
-<section class="stats"><div class="stat"><div class="stathead">TOTAL</div><div class="num" id="stTotal">0</div></div><div class="stat"><div class="stathead">2XX SUCCESS</div><div class="num" id="st2">0</div></div><div class="stat"><div class="stathead">REDIRECTED</div><div class="num" id="stRedirected">0</div></div><div class="stat"><div class="stathead">4XX / 5XX</div><div class="num" id="st45">0</div></div><div class="stat"><div class="stathead">ERRORS</div><div class="num" id="stErr">0</div></div></section>
-<section class="card results"><div class="toolbar"><div class="title">Results <span id="visible" style="color:#98a2b3;font-weight:500">(0)</span></div><input class="search" id="search" placeholder="Search URL or final URL…"><select class="filter" id="filter"><option value="all">All statuses</option><option value="2xx">2xx success</option><option value="3xx">3xx responses</option><option value="4xx">4xx errors</option><option value="5xx">5xx errors</option><option value="error">Request errors</option><option value="redirected">Has redirects</option><option value="changed">Final URL changed</option><option value="none">No redirects</option></select><select class="filter" id="exactStatus"><option value="all">Any status</option></select><button class="btn" id="copyUrls" disabled>Copy URLs</button><button class="btn" id="csv" disabled>CSV</button><button class="btn" id="xlsx" disabled>Excel</button></div>
-<div class="table"><table><thead><tr><th></th><th>#</th><th>Request URL</th><th>Status</th><th>Final URL</th><th>Redirects</th><th>Time</th><th>Content-Type</th></tr></thead><tbody id="body"><tr><td colspan="8"><div class="empty">No results yet. Add URLs above and click “Check status”.</div></td></tr></tbody></table></div></section>
+<section class="stats"><div class="stat"><div class="stathead">TOTAL</div><div class="num" id="stTotal">0</div></div><div class="stat"><div class="stathead">DIRECT 2XX</div><div class="num" id="stDirect2">0</div></div><div class="stat"><div class="stathead">REDIRECTED</div><div class="num" id="stRedirected">0</div></div><div class="stat"><div class="stathead">4XX / 5XX</div><div class="num" id="st45">0</div></div><div class="stat"><div class="stathead">ERRORS</div><div class="num" id="stErr">0</div></div></section>
+<section class="card results"><div style="padding:9px 12px;border-bottom:1px solid var(--line);font-size:10.5px;color:var(--muted)"><b>Status</b> = original URL response. <b>Final Status</b> = last URL response after redirects. So a URL that redirects to a homepage and then returns 200 is <b>REDIRECTED</b>, not a direct 200.</div><div class="toolbar"><div class="title">Results <span id="visible" style="color:#98a2b3;font-weight:500">(0)</span></div><input class="search" id="search" placeholder="Search URL or final URL…"><select class="filter" id="filter"><option value="all">All statuses</option><option value="2xx">2xx direct only</option><option value="direct200">200 direct only</option><option value="redirected200">200 after redirect</option><option value="3xx">3xx responses</option><option value="4xx">4xx errors</option><option value="5xx">5xx errors</option><option value="error">Request errors</option><option value="redirected">Has redirects</option><option value="changed">Final URL changed</option><option value="none">No redirects</option></select><select class="filter" id="exactStatus"><option value="all">Any status</option></select><button class="btn" id="copyUrls" disabled>Copy URLs</button><button class="btn" id="csv" disabled>CSV</button><button class="btn" id="xlsx" disabled>Excel</button></div>
+<div class="table"><table><thead><tr><th></th><th>#</th><th>Request URL</th><th>Status</th><th>Final URL</th><th>Final Status</th><th>Redirects</th><th>Time</th><th>Content-Type</th></tr></thead><tbody id="body"><tr><td colspan="9"><div class="empty">No results yet. Add URLs above and click “Check status”.</div></td></tr></tbody></table></div></section>
 <div class="footer">URL Signal · server-side HTTP checks · built for SEO audits, migrations and redirect validation</div>
 </div></main>
 <div class="toast" id="toast"></div>
@@ -80,12 +80,12 @@ function cls(c){c=String(c||"");return c.startsWith("2")?"s2":c.startsWith("3")?
 function toast(t){let x=$("toast");x.textContent=t;x.style.display="block";clearTimeout(x.t);x.t=setTimeout(()=>x.style.display="none",2400)}
 function summary(){
   const total=results.length;
-  const ok=results.filter(x=>String(x.statusCode).startsWith("2")).length;
+  const direct2=results.filter(x=>String(x.statusCode).startsWith("2") && Number(x.redirectCount||0)===0).length;
   const redirected=results.filter(x=>Number(x.redirectCount||0)>0).length;
   const bad=results.filter(x=>/^[45]/.test(String(x.statusCode||""))).length;
   const errors=results.filter(x=>x.error).length;
   $("stTotal").textContent=total.toLocaleString();
-  $("st2").textContent=ok.toLocaleString();
+  $("stDirect2").textContent=direct2.toLocaleString();
   $("stRedirected").textContent=redirected.toLocaleString();
   $("st45").textContent=bad.toLocaleString();
   $("stErr").textContent=errors.toLocaleString();
@@ -102,29 +102,43 @@ function filtered(){
   let f=$("filter").value;
   let exact=$("exactStatus").value;
   let s=$("sort").value;
+
   let a=results.filter(r=>{
-    const code=String(r.statusCode||"");
+    const originalCode=String(r.statusCode||"");
+    const finalCode=String(r.finalStatusCode||"");
     const redirected=Number(r.redirectCount||0)>0;
     const changed=Boolean(r.finalUrl && r.originalUrl && r.finalUrl!==r.originalUrl);
+
     if(q && !(`${r.originalUrl} ${r.finalUrl||""} ${r.redirectChain||""}`).toLowerCase().includes(q)) return false;
-    if(exact!=="all" && code!==exact) return false;
-    if(f==="2xx" && !code.startsWith("2")) return false;
-    if(f==="3xx" && !code.startsWith("3")) return false;
-    if(f==="4xx" && !code.startsWith("4")) return false;
-    if(f==="5xx" && !code.startsWith("5")) return false;
+
+    // Exact status ALWAYS refers to the ORIGINAL URL response.
+    if(exact!=="all" && originalCode!==exact) return false;
+
+    // "200" / 2xx means direct response from the requested URL.
+    if(f==="2xx" && !(originalCode.startsWith("2") && !redirected)) return false;
+    if(f==="direct200" && !(originalCode==="200" && !redirected)) return false;
+
+    // Final 200 after one or more redirects.
+    if(f==="redirected200" && !(redirected && finalCode==="200")) return false;
+
+    if(f==="3xx" && !originalCode.startsWith("3")) return false;
+    if(f==="4xx" && !originalCode.startsWith("4")) return false;
+    if(f==="5xx" && !originalCode.startsWith("5")) return false;
     if(f==="error" && !r.error) return false;
     if(f==="redirected" && !redirected) return false;
     if(f==="changed" && !changed) return false;
     if(f==="none" && redirected) return false;
+
     return true;
   });
+
   if(s==="status") a.sort((x,y)=>Number(x.statusCode||0)-Number(y.statusCode||0));
   if(s==="redirects") a.sort((x,y)=>Number(y.redirectCount||0)-Number(x.redirectCount||0));
   if(s==="time") a.sort((x,y)=>Number(y.responseTimeMs||0)-Number(x.responseTimeMs||0));
   if(s==="input") a.sort((x,y)=>x.index-y.index);
   return a;
 }
-function render(){let a=filtered();$("visible").textContent="("+a.length.toLocaleString()+")";if(!a.length){body.innerHTML=`<tr><td colspan="8"><div class="empty">${results.length?"No results match the filters.":"No results yet. Add URLs above and click “Check status”."}</div></td></tr>`;return}body.innerHTML=a.map(r=>{let k=String(r.index),is=open.has(k),ch=String(r.redirectChain||"").split(" | ").filter(Boolean);return `<tr><td><button class="expand" data-open="${k}">${is?"−":"+"}</button></td><td style="color:#98a2b3">${r.index+1}</td><td class="url">${esc(r.originalUrl)} <button class="mini-copy" data-copy="${esc(r.originalUrl)}" title="Copy original URL">Copy</button></td><td><span class="badge ${r.error?"err":cls(r.statusCode)}">${r.error?"ERR":esc(r.statusCode)}</span></td><td class="final">${esc(r.finalUrl||"—")} ${r.finalUrl?`<button class="mini-copy" data-copy="${esc(r.finalUrl)}" title="Copy final URL">Copy</button>`:""}</td><td>${r.redirectCount||0}</td><td>${r.responseTimeMs?Number(r.responseTimeMs).toLocaleString()+" ms":"—"}</td><td>${esc((r.contentType||"").split(";")[0]||"—")}</td></tr>${is?`<tr class="details"><td colspan="8"><div class="detail"><div class="box"><h4>Redirect chain</h4><div style="display:flex;gap:6px;margin-bottom:7px"><button class="mini-copy" data-copy="${esc(ch.join("\n"))}">Copy chain</button></div><div class="chain">${ch.length?ch.map((x,i)=>`<div>${i+1}. ${esc(x)}</div>`).join(""):"No redirects detected."}</div></div><div class="box"><h4>Response details</h4><div class="kv"><b>Original</b><span>${esc(r.originalUrl)}</span><b>Final</b><span>${esc(r.finalUrl||"—")}</span><b>Server</b><span>${esc(r.server||"—")}</span><b>Content length</b><span>${esc(r.contentLength||"—")}</span><b>Error</b><span>${esc(r.error||"—")}</span></div></div></div></td></tr>`:""}`}).join("")}
+function render(){let a=filtered();$("visible").textContent="("+a.length.toLocaleString()+")";if(!a.length){body.innerHTML=`<tr><td colspan="9"><div class="empty">${results.length?"No results match the filters.":"No results yet. Add URLs above and click “Check status”."}</div></td></tr>`;return}body.innerHTML=a.map(r=>{let k=String(r.index),is=open.has(k),ch=String(r.redirectChain||"").split(" | ").filter(Boolean);return `<tr><td><button class="expand" data-open="${k}">${is?"−":"+"}</button></td><td style="color:#98a2b3">${r.index+1}</td><td class="url">${esc(r.originalUrl)} <button class="mini-copy" data-copy="${esc(r.originalUrl)}" title="Copy original URL">Copy</button></td><td><span class="badge ${r.error?"err":cls(r.statusCode)}">${r.error?"ERR":esc(r.statusCode)}</span>${!r.error && Number(r.redirectCount||0)>0?`<span class="badge status-redirect">REDIRECTED</span>`:`<span style="font-size:9px;color:#98a2b3;margin-left:5px">DIRECT</span>`}</td><td class="final">${esc(r.finalUrl||"—")} ${r.finalUrl?`<button class="mini-copy" data-copy="${esc(r.finalUrl)}" title="Copy final URL">Copy</button>`:""}</td><td><span class="badge ${r.error?"err":cls(r.finalStatusCode)}">${r.error?"—":esc(r.finalStatusCode||"—")}</span></td><td>${r.redirectCount||0}</td><td>${r.responseTimeMs?Number(r.responseTimeMs).toLocaleString()+" ms":"—"}</td><td>${esc((r.contentType||"").split(";")[0]||"—")}</td></tr>${is?`<tr class="details"><td colspan="9"><div class="detail"><div class="box"><h4>Redirect chain</h4><div style="display:flex;gap:6px;margin-bottom:7px"><button class="mini-copy" data-copy="${esc(ch.join("\n"))}">Copy chain</button></div><div class="chain">${ch.length?ch.map((x,i)=>`<div>${i+1}. ${esc(x)}</div>`).join(""):"No redirects detected."}</div></div><div class="box"><h4>Response details</h4><div class="kv"><b>Original</b><span>${esc(r.originalUrl)}</span><b>Final</b><span>${esc(r.finalUrl||"—")}</span><b>Server</b><span>${esc(r.server||"—")}</span><b>Content length</b><span>${esc(r.contentLength||"—")}</span><b>Error</b><span>${esc(r.error||"—")}</span></div></div></div></td></tr>`:""}`}).join("")}
 async function copyText(text){
   try{
     await navigator.clipboard.writeText(text);
@@ -143,7 +157,7 @@ $("copyUrls").onclick=()=>copyText(filtered().map(r=>r.originalUrl).join("\n"));
 body.onclick=e=>{let b=e.target.closest("[data-open]");if(!b)return;let k=b.dataset.open;open.has(k)?open.delete(k):open.add(k);render()};["search","filter","sort","exactStatus"].forEach(id=>$(id).addEventListener("input",render));["filter","sort","exactStatus"].forEach(id=>$(id).addEventListener("change",render));
 function progress(done,total){let p=total?Math.round(done/total*100):0;$("bar").style.width=p+"%";$("pct").textContent=p+"%";$("plabel").textContent=done.toLocaleString()+" / "+total.toLocaleString()+" checked"}
 check.onclick=async()=>{let raw=list(),sc=$("scheme").value.toLowerCase();if(!raw.length){toast("Add at least one URL first.");return}if(raw.length>2000){toast("Maximum 2,000 URLs per run.");return}raw=raw.map(u=>/^https?:\/\//i.test(u)?u:sc+"://"+u);results=[];open.clear();render();summary();$("progress").style.display="block";progress(0,raw.length);check.disabled=true;check.textContent="Checking…";try{let res=await fetch(API_BASE+"/api/check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({urls:raw,concurrency:Number($("con").value),userAgent:$("ua").value})});if(!res.ok||!res.body)throw Error("Server error: "+res.status);let rd=res.body.getReader(),de=new TextDecoder(),buf="";while(true){let {done,value}=await rd.read();if(done)break;buf+=de.decode(value,{stream:true});let lines=buf.split("\n");buf=lines.pop();for(let line of lines){if(!line.trim())continue;results.push(JSON.parse(line));refreshExactStatuses();summary();progress(results.length,Number(results.at(-1).total||raw.length));render()}}if(buf.trim()){results.push(JSON.parse(buf));refreshExactStatuses();summary();render()}progress(results.length,raw.length);$("plabel").textContent="Done — "+results.length.toLocaleString()+" URLs checked";$("csv").disabled=$("xlsx").disabled=$("copyUrls").disabled=!results.length;toast("Check completed.")}catch(e){$("plabel").textContent="Error: "+e.message;toast(e.message)}finally{check.disabled=false;check.textContent="Check status"}};
-function exportRows(){return filtered().map(r=>({"Original URL":r.originalUrl,"Final URL":r.finalUrl,"Status Code":r.statusCode,"Redirect Count":r.redirectCount,"Redirect Chain":r.redirectChain,"Response Time (ms)":r.responseTimeMs,"Content-Type":r.contentType,"Server":r.server,"Content Length (bytes)":r.contentLength,"Error":r.error}))}
+function exportRows(){return filtered().map(r=>({"Original URL":r.originalUrl,"Final URL":r.finalUrl,"Original Status":r.statusCode,"Final Status":r.finalStatusCode,"Redirect Count":r.redirectCount,"Redirect Chain":r.redirectChain,"Response Time (ms)":r.responseTimeMs,"Content-Type":r.contentType,"Server":r.server,"Content Length (bytes)":r.contentLength,"Error":r.error}))}
 function save(blob,name){let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
 $("csv").onclick=()=>{let a=exportRows();if(!a.length)return;let h=Object.keys(a[0]),csv=[h,...a.map(r=>h.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`))].map(x=>x.join(",")).join("\r\n");save(new Blob([csv],{type:"text/csv"}),"url-signal-results.csv")};
 $("xlsx").onclick=()=>{let a=exportRows();if(!a.length)return;let ws=XLSX.utils.json_to_sheet(a),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Results");XLSX.writeFile(wb,"url-signal-results.xlsx")};
